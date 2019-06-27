@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh0cn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>JS编辑器</title>
+  <style>
+    @font-face {
+      font-family: 'SourceCodePro';
+      src: url('./style/SourceCodePro-Medium.ttf') format('truetype');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .p-flex{
+      display: flex;
+    }
+    .p-jc-c{
+      justify-content: center;
+    }
+    .p-ai-c{
+      align-items: center;
+    }
+    .p-fd-c{
+      flex-direction: column;
+    }
+    html,
+    body,
+    .container {
+      width: 100%;
+      height: 100%;
+      background-color: oldlace;
+    }
+    .container {
+      color: #d4d4d4;
+      position: relative;
+    }
+
+    .view {
+      width: 50%;
+      height: 100%;
+      background-color: #1e1e1e;
+      overflow-x: hidden;
+      overflow-y: auto;
+      font-size: 36px;
+      font-family: 'SourceCodePro';
+    }
+
+    .input {
+      width: 50%;
+      height: 100%;
+      background-color: #252526;
+      border: none;
+      outline: none;
+      color: #d4d4d4;
+      resize: none;
+      font-size: 36px;
+      font-family: 'SourceCodePro';
+    }
+    .control-container{
+      position: absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background-color: #00000080;
+      display:none;
+      user-select: none;
+    }
+    .control{
+      width:500px;
+      height:500px;
+      background-color: #333333;
+    }
+    .control-item{
+      font-size: 32px;
+      margin: 20px 0;
+    }
+    .control-item label{
+      margin-right: 30px;
+    }
+    .control-item input {
+      width: 26px;
+      height: 26px;
+    }
+    .control-item button{
+      width: 60px;
+      height: 40px;
+      border-radius: 8px;
+      border:none;
+      outline: none;
+      font-size: 36px;
+      font-weight: bold;
+    }
+    .control-item span{
+      /* margin: 0 24px; */
+      display:inline-block;
+      width: 120px;
+      text-align: center;
+    }
+    .container-col{
+      flex-direction: column;
+    }
+    .container-col .input,.container-col .view{
+      width:100%;
+      height:50%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container p-flex">
+    <textarea class="input"></textarea>
+    <div class="view"></div>
+    <div class="control-container p-flex p-jc-c p-ai-c">
+      <div class="control p-flex p-jc-c p-ai-c p-fd-c">
+        <div class="control-item p-flex p-ai-c control-style">
+          版式：
+          <input name="style" type="radio" id="style-row" checked>
+          <label for="style-row">横屏</label>
+          <input name="style" type="radio" id="style-col">
+          <label for="style-col">竖屏</label>
+        </div>
+        <div class="control-item p-flex p-ai-c">
+          字体：
+          <button class="control-sub">-</button>
+          <span class="control-fz">36px</span>
+          <button class="control-add">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  //节点
+  const el = {
+    c: document.getElementsByClassName('container')[0],
+    t: document.getElementsByClassName('input')[0],//text
+    v: document.getElementsByClassName('view')[0], //view
+    c_style: document.getElementsByClassName('control-style')[0],
+    c_sub: document.getElementsByClassName('control-sub')[0],
+    c_add: document.getElementsByClassName('control-add')[0],
+    c_container: document.getElementsByClassName('control-container')[0],
+    c_fz: document.getElementsByClassName('control-fz')[0],
+    c_row: document.getElementById('style-row'),
+    c_col: document.getElementById('style-col'),
+  }
+  const mark = {
+    colClassName:'container p-flex container-col',
+    rowClassName:'container p-flex',
+    minFzTip:'不能小于0哦~',
+    newTripleClick:tripleClick(showControl),
+    clickMaxGap:200,
+    fontSize:36,
+    unit:'px',
+    smallGap: '　　',
+    errorTip:'代码错误，请检查！',
+    gap: '\n------------\n',
+    tryStart: 'try{',
+    tryEnd: '}catch(err){}',
+    default: `let str = 'ABCDEFG';
+let arr = ['A','B','C','D','E','F'];
+let obj = {
+  str,
+  arr
+}
+c(str,arr);
+c(obj);
+`
+  };
+  el.t.addEventListener('input', event => {
+    handleInput(event.srcElement.value);
+  });
+  el.v.addEventListener('click', event => {
+    mark.newTripleClick(event.timeStamp);
+  });
+  el.c_container.addEventListener('click', event => {
+    if(event.target === el.c_container){
+      el.c_container.style.display = 'none';
+    };
+  });
+  el.c_sub.addEventListener('click', event => {
+    if(mark.fontSize > 0){
+      mark.fontSize--;
+      setFontSize(mark.fontSize);
+    }else{
+      alert(mark.minFzTip);
+    }
+  });
+  el.c_add.addEventListener('click', event => {
+    mark.fontSize++;
+    setFontSize(mark.fontSize);
+  });
+  el.c_style.addEventListener('click', event => {
+    event.stopPropagation();
+    setRow(el.c_row.checked);
+  });
+  init();
+  function setRow(flag){
+    el.c.className = flag ? mark.rowClassName : mark.colClassName;
+    localStorage.rowFlag = flag ? 'true' : 'false';
+  }
+  function setFontSize(num){
+    const fz = num + mark.unit;
+    el.c_fz.innerText = fz;
+    el.t.style.fontSize = fz;
+    el.v.style.fontSize = fz;
+    localStorage.fontSize = num;
+  }
+  function showControl(){
+    el.c_container.style.display = 'flex';
+  }
+  function tripleClick(fn){
+    let oldClickTimeStamp = 0;
+    let clickCount = 0;
+    return function(timeStamp){
+      if( (timeStamp - oldClickTimeStamp) < mark.clickMaxGap ){
+        if(clickCount == 1){
+          oldClickTimeStamp = 0;
+          clickCount = 0;
+          fn();
+        }else{
+          oldClickTimeStamp = timeStamp;
+          clickCount++;
+        }
+      }else{
+        oldClickTimeStamp = timeStamp;
+        clickCount = 0;
+      }
+    }
+  }
+  function init() {
+    const setRowFlag = localStorage.rowFlag || 'true';
+    if(setRowFlag == 'false'){
+      setRow(false);
+      el.c_col.checked = true;
+    }
+    const setFzNum = localStorage.fontSize || '36';
+    mark.fontSize = +setFzNum;
+    setFontSize(mark.fontSize);
+
+    el.t.value = mark.default;
+    handleInput();
+  }
+  function handleInput(value = '') {
+    el.v.innerText = '';
+    try {
+      eval(mark.tryStart + value + mark.tryEnd);
+    } catch (error) {
+      el.v.innerText = mark.errorTip;
+    }
+  }
+  function c(...args) {
+    args.forEach((item, index) => {
+      let lastFlag = false;
+      const tempText = el.v.innerText;
+      if ((index + 1) == args.length) {
+        lastFlag = true;
+      }
+      el.v.innerText = tempText + JSON.stringify(item) + (lastFlag ? mark.gap : mark.smallGap);
+    });
+  }
+</script>
+
+</html>
