@@ -38,31 +38,25 @@
       color: #d4d4d4;
       position: relative;
     }
-
-    .view {
+    .view, .input{
       width: 50%;
       height: 100%;
-      background-color: #1e1e1e;
-      overflow-x: hidden;
-      overflow-y: auto;
       font-size: 36px;
       font-family: 'SourceCodePro';
       box-sizing: border-box;
       padding:10px;
     }
-
+    .view {
+      background-color: #1e1e1e;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
     .input {
-      width: 50%;
-      height: 100%;
       background-color: #252526;
       border: none;
       outline: none;
       color: #d4d4d4;
       resize: none;
-      font-size: 36px;
-      font-family: 'SourceCodePro';
-      box-sizing: border-box;
-      padding:10px;
     }
     .control-container{
       position: absolute;
@@ -100,7 +94,6 @@
       font-weight: bold;
     }
     .control-item span{
-      /* margin: 0 24px; */
       display:inline-block;
       width: 120px;
       text-align: center;
@@ -141,16 +134,16 @@
 <script>
   //节点
   const el = {
-    c: document.getElementsByClassName('container')[0],
-    t: document.getElementsByClassName('input')[0],//text
-    v: document.getElementsByClassName('view')[0], //view
-    c_style: document.getElementsByClassName('control-style')[0],
-    c_sub: document.getElementsByClassName('control-sub')[0],
-    c_add: document.getElementsByClassName('control-add')[0],
-    c_container: document.getElementsByClassName('control-container')[0],
-    c_fz: document.getElementsByClassName('control-fz')[0],
-    c_row: document.getElementById('style-row'),
-    c_col: document.getElementById('style-col'),
+    c: document.getElementsByClassName('container')[0],//最大的容器
+    t: document.getElementsByClassName('input')[0],//输入框
+    v: document.getElementsByClassName('view')[0], //控制台视窗
+    c_style: document.getElementsByClassName('control-style')[0],//横纵版式
+    c_sub: document.getElementsByClassName('control-sub')[0],//字体-
+    c_add: document.getElementsByClassName('control-add')[0],//字体+
+    c_container: document.getElementsByClassName('control-container')[0],//控制台容器
+    c_fz: document.getElementsByClassName('control-fz')[0],//当前字体大小数字
+    c_row: document.getElementById('style-row'),//横屏 单选框
+    c_col: document.getElementById('style-col'),//竖屏 单选框
   }
   const mark = {
     colClassName:'container p-flex container-col',
@@ -176,17 +169,62 @@ c(obj);
 `
   };
   el.t.addEventListener('input', event => {
+    //每次输入同步到右侧
     handleInput(event.srcElement.value);
   });
+  el.t.addEventListener('keydown', event => {
+    //光标位置
+    const selection = {
+      end: event.target.selectionEnd,
+      start: event.target.selectionStart
+    }
+    //设置TAB为两个空格
+    if(event.keyCode == 9){
+      event.preventDefault();
+      const value = el.t.value;
+      el.t.value = value.substring(0,selection.end) + '  ' + value.substring(selection.end);
+      el.t.setSelectionRange(selection.end+2, selection.end+2);
+    }
+    //设置 Ctrl+X(88)/C(67) && 光标没有选中内容 为剪切/复制一整行。
+    if(event.ctrlKey && (selection.end == selection.start) ){//无选中情况下剪切、复制
+      let contentArr = [];
+      let StartLength = 0;//累计开始位置
+      let EndLength = 0;//累计结束位置
+      if( event.keyCode == 88 || event.keyCode == 67 ){
+        contentArr = el.t.value.split('\n');
+        contentArr.some(item=>{
+          //累计结束位置 = 累计开始位置 + 本项内容长度 + 换行符
+          EndLength = StartLength + item.length + 1 ;
+          if(EndLength > selection.end){
+            return true;
+          }
+          StartLength = EndLength;
+        });
+      }
+      if(event.keyCode == 88){//Ctrl+X(88)
+        //选择后，默认触发剪切事件
+        el.t.setSelectionRange(StartLength, EndLength);
+      }else if(event.keyCode == 67){//Ctrl+C(67)
+        //阻止最后的默认复制，因为最后要清空选中，光标归位。
+        event.preventDefault();
+        el.t.setSelectionRange(StartLength, EndLength);
+        document.execCommand('Copy','false',null);
+        el.t.setSelectionRange(selection.end, selection.end);
+      }
+    }
+  });
   el.v.addEventListener('click', event => {
+    //点击右侧 触发3连点闭包函数
     mark.newTripleClick(event.timeStamp);
   });
   el.c_container.addEventListener('click', event => {
+    //点击遮罩
     if(event.target === el.c_container){
       el.c_container.style.display = 'none';
     };
   });
   el.c_sub.addEventListener('click', event => {
+    //点击 -号
     if(mark.fontSize > 0){
       mark.fontSize--;
       setFontSize(mark.fontSize);
@@ -195,19 +233,23 @@ c(obj);
     }
   });
   el.c_add.addEventListener('click', event => {
+    //点击 +号
     mark.fontSize++;
     setFontSize(mark.fontSize);
   });
   el.c_style.addEventListener('click', event => {
+    // 点击切换横纵
     event.stopPropagation();
     setRow(el.c_row.checked);
   });
-  init();
-  function setRow(flag){
-    el.c.className = flag ? mark.rowClassName : mark.colClassName;
-    localStorage.rowFlag = flag ? 'true' : 'false';
+  init();//初始化。
+  function setRow(rowFlag){
+    //切换横纵 rowFlag
+    el.c.className = rowFlag ? mark.rowClassName : mark.colClassName;
+    localStorage.rowFlag = rowFlag ? 'true' : 'false';
   }
   function setFontSize(num){
+    //设置字体大小
     const fz = num + mark.unit;
     el.c_fz.innerText = fz;
     el.t.style.fontSize = fz;
@@ -215,9 +257,11 @@ c(obj);
     localStorage.fontSize = num;
   }
   function showControl(){
+    //显示弹窗
     el.c_container.style.display = 'flex';
   }
   function tripleClick(fn){
+    //3连点击闭包函数
     let oldClickTimeStamp = 0;
     let clickCount = 0;
     return function(timeStamp){
@@ -237,19 +281,22 @@ c(obj);
     }
   }
   function init() {
+    //初始化 横纵
     const setRowFlag = localStorage.rowFlag || 'true';
     if(setRowFlag == 'false'){
       setRow(false);
       el.c_col.checked = true;
     }
+    //初始化 字体大小
     const setFzNum = localStorage.fontSize || '36';
     mark.fontSize = +setFzNum;
     setFontSize(mark.fontSize);
-
+    //初始化 默认内容
     el.t.value = mark.default;
-    handleInput();
+    handleInput(mark.default);
   }
   function handleInput(value = '') {
+    //执行输入框js
     el.v.innerText = '';
     try {
       eval(mark.tryStart + value + mark.tryEnd);
@@ -258,6 +305,7 @@ c(obj);
     }
   }
   function c(...args) {
+    //输出到右侧
     args.forEach((item, index) => {
       let lastFlag = false;
       const tempText = el.v.innerText;
