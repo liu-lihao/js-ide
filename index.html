@@ -178,10 +178,10 @@ c(obj);
       end: event.target.selectionEnd,
       start: event.target.selectionStart
     }
+    const value = el.t.value;
     //设置TAB为两个空格
     if(event.keyCode == 9){
       event.preventDefault();
-      const value = el.t.value;
       el.t.value = value.substring(0,selection.end) + '  ' + value.substring(selection.end);
       el.t.setSelectionRange(selection.end+2, selection.end+2);
     }
@@ -191,7 +191,7 @@ c(obj);
       let StartLength = 0;//累计开始位置
       let EndLength = 0;//累计结束位置
       if( event.keyCode == 88 || event.keyCode == 67 ){
-        contentArr = el.t.value.split('\n');
+        contentArr = value.split('\n');
         contentArr.some(item=>{
           //累计结束位置 = 累计开始位置 + 本项内容长度 + 换行符
           EndLength = StartLength + item.length + 1 ;
@@ -207,10 +207,20 @@ c(obj);
       }else if(event.keyCode == 67){//Ctrl+C(67)
         //阻止最后的默认复制，因为最后要清空选中，光标归位。
         event.preventDefault();
-        el.t.setSelectionRange(StartLength, EndLength);
+        el.t.setSelectionRange(StartLength-1, EndLength-1);
         document.execCommand('Copy','false',null);
         el.t.setSelectionRange(selection.end, selection.end);
       }
+    }
+    //设置Enter 保留缩进
+    if(event.keyCode == 13 && (selection.end == selection.start) ){//Enter 13
+      event.preventDefault();
+      const beoforeValue = value.substring(0,selection.end);
+      const beoforeNewLineIndex = beoforeValue.lastIndexOf('\n');
+      const beoforeLineValue = value.substring(beoforeNewLineIndex != -1 ? beoforeNewLineIndex+1 : 0+1 ,selection.end);
+      const targetSpace = /^\s*/g.exec(beoforeLineValue)[0];
+      el.t.value = beoforeValue + '\n' + targetSpace + value.substring(selection.end);
+      el.t.setSelectionRange(selection.end + targetSpace.length + 1, selection.end + targetSpace.length + 1);
     }
   });
   el.v.addEventListener('click', event => {
