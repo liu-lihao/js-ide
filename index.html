@@ -127,6 +127,13 @@
           <span class="control-fz">36px</span>
           <button class="control-add">+</button>
         </div>
+        <div class="control-item p-flex p-ai-c control-input">
+          输入：
+          <input name="input" type="radio" id="input-nor" checked>
+          <label for="input-nor"><a title="正常输入模式">正常</a></label>
+          <input name="input" type="radio" id="input-tra">
+          <label for="input-tra"><a title="将常用中文符号转英文符号">转换</a></label>
+        </div>
       </div>
     </div>
   </div>
@@ -138,14 +145,19 @@
     t: document.getElementsByClassName('input')[0],//输入框
     v: document.getElementsByClassName('view')[0], //控制台视窗
     c_style: document.getElementsByClassName('control-style')[0],//横纵版式
+    c_input: document.getElementsByClassName('control-input')[0],//输入模式
     c_sub: document.getElementsByClassName('control-sub')[0],//字体-
     c_add: document.getElementsByClassName('control-add')[0],//字体+
     c_container: document.getElementsByClassName('control-container')[0],//控制台容器
     c_fz: document.getElementsByClassName('control-fz')[0],//当前字体大小数字
     c_row: document.getElementById('style-row'),//横屏 单选框
     c_col: document.getElementById('style-col'),//竖屏 单选框
+    c_nor: document.getElementById('input-nor'),//正常输入模式 单选框
+    c_tra: document.getElementById('input-tra'),//转英文符号模式 单选框
   }
   const mark = {
+    inputMode:'normal',//transform
+    inputModeOption:['normal','transform'],
     colClassName:'container p-flex container-col',
     rowClassName:'container p-flex',
     minFzTip:'不能小于0哦~',
@@ -170,6 +182,15 @@ c(obj);
   };
   el.t.addEventListener('input', event => {
     //每次输入同步到右侧
+    if(mark.inputMode == mark.inputModeOption[1]){
+      const selection = {
+        end: event.target.selectionEnd,
+        start: event.target.selectionStart
+      }
+      console.log('转换模式',el.t.value);
+      el.t.value = transformText(el.t.value);
+      el.t.setSelectionRange(selection.end, selection.end);
+    }
     handleInput(event.srcElement.value);
   });
   el.t.addEventListener('keydown', event => {
@@ -252,7 +273,17 @@ c(obj);
     event.stopPropagation();
     setRow(el.c_row.checked);
   });
+  el.c_input.addEventListener('click', event => {
+    // 点击输入模式
+    event.stopPropagation();
+    setInput(el.c_nor.checked);
+  });
   init();//初始化。
+  function setInput(norFlag){
+    //切换输入模式
+    mark.inputMode = norFlag ? mark.inputModeOption[0] : mark.inputModeOption[1];
+    localStorage.norFlag = norFlag ? 'true' : 'false';
+  }
   function setRow(rowFlag){
     //切换横纵 rowFlag
     el.c.className = rowFlag ? mark.rowClassName : mark.colClassName;
@@ -297,6 +328,12 @@ c(obj);
       setRow(false);
       el.c_col.checked = true;
     }
+    //初始化 输入模式
+    const setNorFlag = localStorage.norFlag || 'true';
+    if(setNorFlag == 'false'){
+      setInput(false);
+      el.c_tra.checked = true;
+    }
     //初始化 字体大小
     const setFzNum = localStorage.fontSize || '36';
     mark.fontSize = +setFzNum;
@@ -304,6 +341,26 @@ c(obj);
     //初始化 默认内容
     el.t.value = mark.default;
     handleInput(mark.default);
+  }
+  function transformText(str){
+    str = str.replace(/）/g,')')
+      .replace(/（/g,'(')
+      .replace(/【/g,'[')
+      .replace(/】/g,']')
+      .replace(/，/g,',')
+      .replace(/。/g,'.')
+      .replace(/！/g,'!')
+      .replace(/《/g,'<')
+      .replace(/》/g,'>')
+      .replace(/？/g,'?')
+      .replace(/、/g,'/')
+      .replace(/：/g,':')
+      .replace(/；/g,';')
+      .replace(/’/g,"'")
+      .replace(/‘/g,"'")
+      .replace(/“/g,'"')
+      .replace(/”/g,'"');
+    return str;
   }
   function handleInput(value = '') {
     //执行输入框js
