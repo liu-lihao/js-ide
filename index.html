@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh0cn">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,18 +16,23 @@
       margin: 0;
       padding: 0;
     }
-    .p-flex{
+
+    .p-flex {
       display: flex;
     }
-    .p-jc-c{
+
+    .p-jc-c {
       justify-content: center;
     }
-    .p-ai-c{
+
+    .p-ai-c {
       align-items: center;
     }
-    .p-fd-c{
+
+    .p-fd-c {
       flex-direction: column;
     }
+
     html,
     body,
     .container {
@@ -34,23 +40,29 @@
       height: 100%;
       background-color: oldlace;
     }
+
     .container {
       color: #d4d4d4;
       position: relative;
     }
-    .view, .input{
+
+    .view,
+    .input {
       width: 50%;
       height: 100%;
       font-size: 36px;
       font-family: 'SourceCodePro';
       box-sizing: border-box;
-      padding:10px;
+      padding: 10px;
     }
+
     .view {
       background-color: #1e1e1e;
       overflow-x: hidden;
       overflow-y: auto;
+      word-wrap:break-word;
     }
+
     .input {
       background-color: #252526;
       border: none;
@@ -58,52 +70,75 @@
       color: #d4d4d4;
       resize: none;
     }
-    .control-container{
+
+    .control-container {
       position: absolute;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background-color: #00000080;
-      display:none;
+      display: none;
       user-select: none;
     }
-    .control{
-      width:500px;
-      height:500px;
+
+    .control {
+      width: 500px;
+      height: 500px;
       background-color: #333333;
     }
-    .control-item{
+
+    .control-item {
       font-size: 32px;
       margin: 20px 0;
     }
-    .control-item label{
+
+    .control-item label {
       margin-right: 30px;
     }
+
     .control-item input {
       width: 26px;
       height: 26px;
     }
-    .control-item button{
+
+    .control-item button {
       width: 60px;
       height: 40px;
       border-radius: 8px;
-      border:none;
+      border: none;
       outline: none;
       font-size: 36px;
       font-weight: bold;
     }
-    .control-item span{
-      display:inline-block;
+
+    .control-item button:hover {
+      background-color: #c2c2c2;
+    }
+
+    .container button:active {
+      background-color: rgb(211, 211, 211);
+    }
+
+    .control-item .control-share {
+      width: 240px;
+      font-size: 24px;
+    }
+
+    .control-item span {
+      display: inline-block;
       width: 120px;
       text-align: center;
     }
-    .container-col{
+
+    .container-col {
       flex-direction: column;
     }
-    .container-col .input,.container-col .view{
-      width:100%;
-      height:50%;
+
+    .container-col .input,
+    .container-col .view {
+      width: 100%;
+      height: 50%;
     }
   </style>
 </head>
@@ -134,6 +169,10 @@
           <input name="input" type="radio" id="input-tra">
           <label for="input-tra"><a title="将常用中文符号转英文符号">转换</a></label>
         </div>
+        <div class="control-item p-flex p-ai-c">
+          分享：
+          <button class="control-share">点我复制到剪切板</button>
+        </div>
       </div>
     </div>
   </div>
@@ -154,19 +193,20 @@
     c_col: document.getElementById('style-col'),//竖屏 单选框
     c_nor: document.getElementById('input-nor'),//正常输入模式 单选框
     c_tra: document.getElementById('input-tra'),//转英文符号模式 单选框
+    c_share: document.getElementsByClassName('control-share')[0],//分享按钮
   }
   const mark = {
-    inputMode:'normal',//transform
-    inputModeOption:['normal','transform'],
-    colClassName:'container p-flex container-col',
-    rowClassName:'container p-flex',
-    minFzTip:'不能小于0哦~',
-    newTripleClick:tripleClick(showControl),
-    clickMaxGap:200,
-    fontSize:36,
-    unit:'px',
+    inputMode: 'normal',//transform
+    inputModeOption: ['normal', 'transform'],
+    colClassName: 'container p-flex container-col',
+    rowClassName: 'container p-flex',
+    minFzTip: '不能小于0哦~',
+    newTripleClick: tripleClick(showControl),
+    clickMaxGap: 200,
+    fontSize: 36,
+    unit: 'px',
     smallGap: '　　',
-    errorTip:'代码错误，请检查！',
+    errorTip: '代码错误，请检查！',
     gap: '\n------------\n',
     tryStart: 'try{',
     tryEnd: '}catch(err){}',
@@ -182,12 +222,11 @@ c(obj);
   };
   el.t.addEventListener('input', event => {
     //每次输入同步到右侧
-    if(mark.inputMode == mark.inputModeOption[1]){
+    if (mark.inputMode == mark.inputModeOption[1]) {
       const selection = {
         end: event.target.selectionEnd,
         start: event.target.selectionStart
       }
-      console.log('转换模式',el.t.value);
       el.t.value = transformText(el.t.value);
       el.t.setSelectionRange(selection.end, selection.end);
     }
@@ -201,44 +240,44 @@ c(obj);
     }
     const value = el.t.value;
     //设置TAB为两个空格
-    if(event.keyCode == 9){
+    if (event.keyCode == 9) {
       event.preventDefault();
-      el.t.value = value.substring(0,selection.end) + '  ' + value.substring(selection.end);
-      el.t.setSelectionRange(selection.end+2, selection.end+2);
+      el.t.value = value.substring(0, selection.end) + '  ' + value.substring(selection.end);
+      el.t.setSelectionRange(selection.end + 2, selection.end + 2);
     }
     //设置 Ctrl+X(88)/C(67) && 光标没有选中内容 为剪切/复制一整行。
-    if(event.ctrlKey && (selection.end == selection.start) ){//无选中情况下剪切、复制
+    if (event.ctrlKey && (selection.end == selection.start)) {//无选中情况下剪切、复制
       let contentArr = [];
       let StartLength = 0;//累计开始位置
       let EndLength = 0;//累计结束位置
-      if( event.keyCode == 88 || event.keyCode == 67 ){
+      if (event.keyCode == 88 || event.keyCode == 67) {
         contentArr = value.split('\n');
-        contentArr.some(item=>{
+        contentArr.some(item => {
           //累计结束位置 = 累计开始位置 + 本项内容长度 + 换行符
-          EndLength = StartLength + item.length + 1 ;
-          if(EndLength > selection.end){
+          EndLength = StartLength + item.length + 1;
+          if (EndLength > selection.end) {
             return true;
           }
           StartLength = EndLength;
         });
       }
-      if(event.keyCode == 88){//Ctrl+X(88)
+      if (event.keyCode == 88) {//Ctrl+X(88)
         //选择后，默认触发剪切事件
         el.t.setSelectionRange(StartLength, EndLength);
-      }else if(event.keyCode == 67){//Ctrl+C(67)
+      } else if (event.keyCode == 67) {//Ctrl+C(67)
         //阻止最后的默认复制，因为最后要清空选中，光标归位。
         event.preventDefault();
-        el.t.setSelectionRange(StartLength-1, EndLength-1);
-        document.execCommand('Copy','false',null);
+        el.t.setSelectionRange(StartLength - 1, EndLength - 1);
+        document.execCommand('Copy', 'false', null);
         el.t.setSelectionRange(selection.end, selection.end);
       }
     }
     //设置Enter 保留缩进
-    if(event.keyCode == 13 && (selection.end == selection.start) ){//Enter 13
+    if (event.keyCode == 13 && (selection.end == selection.start)) {//Enter 13
       event.preventDefault();
-      const beoforeValue = value.substring(0,selection.end);
+      const beoforeValue = value.substring(0, selection.end);
       const beoforeNewLineIndex = beoforeValue.lastIndexOf('\n');
-      const beoforeLineValue = value.substring(beoforeNewLineIndex != -1 ? beoforeNewLineIndex+1 : 0+1 ,selection.end);
+      const beoforeLineValue = value.substring(beoforeNewLineIndex != -1 ? beoforeNewLineIndex + 1 : 0 + 1, selection.end);
       const targetSpace = /^\s*/g.exec(beoforeLineValue)[0];
       el.t.value = beoforeValue + '\n' + targetSpace + value.substring(selection.end);
       el.t.setSelectionRange(selection.end + targetSpace.length + 1, selection.end + targetSpace.length + 1);
@@ -250,16 +289,16 @@ c(obj);
   });
   el.c_container.addEventListener('click', event => {
     //点击遮罩
-    if(event.target === el.c_container){
-      el.c_container.style.display = 'none';
+    if (event.target === el.c_container) {
+      hideControl();
     };
   });
   el.c_sub.addEventListener('click', event => {
     //点击 -号
-    if(mark.fontSize > 0){
+    if (mark.fontSize > 0) {
       mark.fontSize--;
       setFontSize(mark.fontSize);
-    }else{
+    } else {
       alert(mark.minFzTip);
     }
   });
@@ -278,18 +317,30 @@ c(obj);
     event.stopPropagation();
     setInput(el.c_nor.checked);
   });
+  el.c_share.addEventListener('click', event => {
+    // 点击分享
+    const code = el.t.value;
+    const tempUrl = parseUrl().link + '?' + stringifyQuery({code});//压缩前
+    const url = compressUrl(tempUrl);
+    el.t.value = url;
+    el.t.focus();
+    el.t.setSelectionRange(0, 99999999);
+    document.execCommand('Copy', 'false', null);
+    el.t.value = code;
+    alert('已复制链接，让小伙伴打开，分享你的代码吧~');
+  });
   init();//初始化。
-  function setInput(norFlag){
+  function setInput(norFlag) {
     //切换输入模式
     mark.inputMode = norFlag ? mark.inputModeOption[0] : mark.inputModeOption[1];
     localStorage.norFlag = norFlag ? 'true' : 'false';
   }
-  function setRow(rowFlag){
+  function setRow(rowFlag) {
     //切换横纵 rowFlag
     el.c.className = rowFlag ? mark.rowClassName : mark.colClassName;
     localStorage.rowFlag = rowFlag ? 'true' : 'false';
   }
-  function setFontSize(num){
+  function setFontSize(num) {
     //设置字体大小
     const fz = num + mark.unit;
     el.c_fz.innerText = fz;
@@ -297,40 +348,23 @@ c(obj);
     el.v.style.fontSize = fz;
     localStorage.fontSize = num;
   }
-  function showControl(){
+  function showControl() {
     //显示弹窗
     el.c_container.style.display = 'flex';
   }
-  function tripleClick(fn){
-    //3连点击闭包函数
-    let oldClickTimeStamp = 0;
-    let clickCount = 0;
-    return function(timeStamp){
-      if( (timeStamp - oldClickTimeStamp) < mark.clickMaxGap ){
-        if(clickCount == 1){
-          oldClickTimeStamp = 0;
-          clickCount = 0;
-          fn();
-        }else{
-          oldClickTimeStamp = timeStamp;
-          clickCount++;
-        }
-      }else{
-        oldClickTimeStamp = timeStamp;
-        clickCount = 0;
-      }
-    }
+  function hideControl() {
+    el.c_container.style.display = 'none';
   }
   function init() {
     //初始化 横纵
     const setRowFlag = localStorage.rowFlag || 'true';
-    if(setRowFlag == 'false'){
+    if (setRowFlag == 'false') {
       setRow(false);
       el.c_col.checked = true;
     }
     //初始化 输入模式
     const setNorFlag = localStorage.norFlag || 'true';
-    if(setNorFlag == 'false'){
+    if (setNorFlag == 'false') {
       setInput(false);
       el.c_tra.checked = true;
     }
@@ -339,27 +373,32 @@ c(obj);
     mark.fontSize = +setFzNum;
     setFontSize(mark.fontSize);
     //初始化 默认内容
-    el.t.value = mark.default;
-    handleInput(mark.default);
+    const tempUrl = compressUrl(window.location.href,false);//解密后的url
+    const code = parseUrl(tempUrl).query.code || mark.default;
+    el.t.value = code;
+    handleInput(code);
+    //链接美化
+    window.history.pushState({status: 0} ,'','index.html')
   }
-  function transformText(str){
-    str = str.replace(/）/g,')')
-      .replace(/（/g,'(')
-      .replace(/【/g,'[')
-      .replace(/】/g,']')
-      .replace(/，/g,',')
-      .replace(/。/g,'.')
-      .replace(/！/g,'!')
-      .replace(/《/g,'<')
-      .replace(/》/g,'>')
-      .replace(/？/g,'?')
-      .replace(/、/g,'/')
-      .replace(/：/g,':')
-      .replace(/；/g,';')
-      .replace(/’/g,"'")
-      .replace(/‘/g,"'")
-      .replace(/“/g,'"')
-      .replace(/”/g,'"');
+  // http://www.zzsky.cn/code/mrmy/mrmy.asp
+  function transformText(str) {
+    str = str.replace(/）/g, ')')
+      .replace(/（/g, '(')
+      .replace(/【/g, '[')
+      .replace(/】/g, ']')
+      .replace(/，/g, ',')
+      .replace(/。/g, '.')
+      .replace(/！/g, '!')
+      .replace(/《/g, '<')
+      .replace(/》/g, '>')
+      .replace(/？/g, '?')
+      .replace(/、/g, '/')
+      .replace(/：/g, ':')
+      .replace(/；/g, ';')
+      .replace(/’/g, "'")
+      .replace(/‘/g, "'")
+      .replace(/“/g, '"')
+      .replace(/”/g, '"');
     return str;
   }
   function handleInput(value = '') {
@@ -381,6 +420,104 @@ c(obj);
       }
       el.v.innerText = tempText + JSON.stringify(item) + (lastFlag ? mark.gap : mark.smallGap);
     });
+  }
+  function tripleClick(fn) {
+    //3连点击闭包函数
+    let oldClickTimeStamp = 0;
+    let clickCount = 0;
+    return function (timeStamp) {
+      if ((timeStamp - oldClickTimeStamp) < mark.clickMaxGap) {
+        if (clickCount == 1) {
+          oldClickTimeStamp = 0;
+          clickCount = 0;
+          fn();
+        } else {
+          oldClickTimeStamp = timeStamp;
+          clickCount++;
+        }
+      } else {
+        oldClickTimeStamp = timeStamp;
+        clickCount = 0;
+      }
+    }
+  }
+  function parseUrl(url=window.location.href) {
+    /*
+      将完整路径解析
+      {
+        url:"完整url",
+        link:"不带参数url",
+        queryStr:"？后面的有效参数"
+        query:{参数},
+      }
+    */
+    const link = url.replace(/\?.*$/, "");
+    const queryStr = url.replace(link,'').replace(/^\??/,"").replace(/\#.*$/,"");
+    const query = parseQuery(queryStr);
+    return { url, link, queryStr, query }
+  }
+  function parseQuery(str=location.search.substr(1)) {
+    const tempQuery = str.split('&').filter(item => item).map(item => {
+      const tempItem = item.split('=');
+      return { [decodeURIComponent(tempItem[0])]: JSON.parse(decodeURIComponent(tempItem[1] || '""')) }
+    });
+    let result = Object.assign({}, ...tempQuery);
+    return result;
+  }
+  function stringifyQuery(obj) {
+    return Object.keys(obj).map(item => encodeURIComponent(item) + '=' + encodeURIComponent(JSON.stringify(obj[item]))).join('&');
+  }
+  function compressUrl(url=window.location.href,compress=true) {//compress压缩
+    //脱离业务，仅对？后面所有参数进行压缩。
+    const newVersion = "01";//压缩版本号
+    const code = "l~h";//替符前缀
+    const code_reg = "l\\~h";//替换前缀(正则)
+    const get_version = /^l\~(\S{2})\~h.*$/;
+    const clear_version = /^l\~(\S{2})\~h/;
+    //压缩库
+    const compressStorage =
+    {
+      //"01" 2019年8月4日00:37:54
+      "01": ["%0A%0A%0A%0A%0A%0A%0A%0A%0A","%0A%0A%0A%0A%0A%0A%0A%0A","%20%20%20%20%20%20%20%20","\\(%20\\(\\)%20%3D%3E%20%7B","%0A%0A%0A%0A%0A%0A%0A","%20%20%20%20%20%20%20","\\.toLocaleDateString\\(","\\.toLocaleDateString\\(","item%20%3D%3E%20%7B","%0A%0A%0A%0A%0A%0A","%20%20%20%20%20%20","\\.setMilliseconds\\(","\\.getMilliseconds\\(","\\(iten%2C%20index\\)","\\(\\)%20%3D%3E%20%7B","\\.toLocaleString\\(","%20%3D%3D%3D%20","%0A%0A%0A%0A%0A","%20%20%20%20%20","\\(iten%2Cindex\\)","\\.fromCharCode\\(","%7Delse%20if\\(\\)","\\.setFullYear\\(","\\.getFullYear\\(","\\.lastIndexOf\\(","\\.toUpperCase\\(","\\.toLowerCase\\(","item%3D%3E%7B","function%20\\(\\)","\\.setSeconds\\(","\\.setMinutes\\(","\\.getSeconds\\(","\\.getMinutes\\(","\\.charCodeAt\\(","Object\\.keys\\(","%20%3D%3D%20","%20%3D%20%5B","%5B%5D%3B%0A","\\(\\(\\)%3D%3E%7B","%0A%0A%0A%0A","%20%20%20%20","new%20Date\\(","\\.substring\\(","\\(\\)%3D%3E%7B","function%20","%0A%7D%0Ac\\(","\\.setHours\\(","\\.setMonth\\(","\\.getHours\\(","\\.getMonth\\(","Array\\.from","\\.prototype","\\)%20%7B%0A","%7D\\)%3B%0A","function\\(\\)","%27%2C%27","\\.setDate\\(","\\.getTime\\(","\\.getDate\\(","\\.forEach\\(","\\.replace\\(","\\.indexOf\\(","%7D%2C%0A","%7D%2C%20","\\.unshift\\(","\\.reverse\\(","\\.toFixed\\(","typeof%20","%3D%20%7B","undefined","return%20","%0A%0A%0A","%20%20%20","%20%3D%20","%5D%3B%0A","%22%2C%22","\\.getDay\\(","\\.filter\\(","\\.search\\(","\\.substr\\(","\\.charAt\\(","\\.reduce\\(","\\.splice\\(","\\.concat\\(","const%20","\\.shift\\(","\\.slice\\(","\\.match\\(","\\.split\\(","\\)%7B%0A","\\.length","window\\.","\\(event\\)","\\)%3B%0A","\\(item\\)","\\.every","\\.push\\(","\\.sort\\(","\\.join\\(","\\.exec\\(","\\.test\\(","%3D%7B","%3D%5B","%5B%5D","%7D%0A","%7B%0A","%3B%0A","var%20","%3D%3E","%0A%0A","%20%20","let%20"],
+    }
+    //得到参数
+    let {link,queryStr} = parseUrl(url);
+    if(queryStr){
+      if(compress){//压缩
+        compressStorage[newVersion].forEach((item,index)=>{
+          const reg = new RegExp(item,'g');
+          const target = code + index.toString(36).padStart(2,'0');
+          queryStr = queryStr.replace(reg,target);
+        });
+        queryStr = 'l~' + newVersion + '~h' + queryStr;
+      }else{//解压缩
+        const tempMatch = queryStr.match(get_version) || [];
+        const version = tempMatch[1] || '';//压缩版本号
+        if(!version){//没有版本的一律不是本方法压缩的，所以url就不做任何改动。
+          return url;
+        }
+        queryStr = queryStr.replace(clear_version,'');
+        compressStorage[version].forEach((item,index)=>{
+          const reg = new RegExp(code_reg + index.toString(36).padStart(2,'0'),'g');
+          const target = item.replace(/\\/g,'');
+          queryStr = queryStr.replace(reg,target);
+        });
+      }
+    }
+
+    //测试
+    // const before = url;
+    // const after = link + (queryStr ? "?" + queryStr : '');
+    // if(compress){
+    //   console.log('压缩前',before.length,before);
+    //   console.log('压缩后',after.length,after);
+    //   console.log('压缩率',  (after.length/before.length * 100).toFixed(2)-0 + '%' );
+    // }else{
+    //   console.log('解压前',url.length);
+    //   console.log('解压后',(link + (queryStr ? "?" + queryStr : '')).length);
+    //   console.log('压缩率',  (before.length/after.length * 100).toFixed(2)-0 + '%' );
+    // }
+    return link + (queryStr ? "?" + queryStr : '');
   }
 </script>
 
