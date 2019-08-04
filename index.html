@@ -327,7 +327,7 @@ c(obj);
     el.t.setSelectionRange(0, 99999999);
     document.execCommand('Copy', 'false', null);
     el.t.value = code;
-    alert('已复制链接，让小伙伴打开，分享你的代码吧~');
+    alert(`<${(url.length/tempUrl.length*100).toFixed(2)}>已复制链接，让小伙伴打开，分享你的代码吧~`);
   });
   init();//初始化。
   function setInput(norFlag) {
