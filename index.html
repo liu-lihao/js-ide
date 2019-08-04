@@ -60,7 +60,7 @@
       background-color: #1e1e1e;
       overflow-x: hidden;
       overflow-y: auto;
-      word-wrap:break-word;
+      word-wrap: break-word;
     }
 
     .input {
@@ -320,7 +320,7 @@ c(obj);
   el.c_share.addEventListener('click', event => {
     // 点击分享
     const code = el.t.value;
-    const tempUrl = parseUrl().link + '?' + stringifyQuery({code});//压缩前
+    const tempUrl = parseUrl().link + '?' + stringifyQuery({ code });//压缩前
     const url = compressUrl(tempUrl);
     el.t.value = url;
     el.t.focus();
@@ -373,12 +373,12 @@ c(obj);
     mark.fontSize = +setFzNum;
     setFontSize(mark.fontSize);
     //初始化 默认内容
-    const tempUrl = compressUrl(window.location.href,false);//解密后的url
+    const tempUrl = compressUrl(window.location.href, false);//解密后的url
     const code = parseUrl(tempUrl).query.code || mark.default;
     el.t.value = code;
     handleInput(code);
     //链接美化
-    window.history.pushState({status: 0} ,'','index.html')
+    window.history.pushState({ status: 0 }, '', 'index.html')
   }
   // http://www.zzsky.cn/code/mrmy/mrmy.asp
   function transformText(str) {
@@ -441,7 +441,7 @@ c(obj);
       }
     }
   }
-  function parseUrl(url=window.location.href) {
+  function parseUrl(url = window.location.href) {
     /*
       将完整路径解析
       {
@@ -452,11 +452,11 @@ c(obj);
       }
     */
     const link = url.replace(/\?.*$/, "");
-    const queryStr = url.replace(link,'').replace(/^\??/,"").replace(/\#.*$/,"");
+    const queryStr = url.replace(link, '').replace(/^\??/, "").replace(/\#.*$/, "");
     const query = parseQuery(queryStr);
     return { url, link, queryStr, query }
   }
-  function parseQuery(str=location.search.substr(1)) {
+  function parseQuery(str = location.search.substr(1)) {
     const tempQuery = str.split('&').filter(item => item).map(item => {
       const tempItem = item.split('=');
       return { [decodeURIComponent(tempItem[0])]: JSON.parse(decodeURIComponent(tempItem[1] || '""')) }
@@ -467,7 +467,7 @@ c(obj);
   function stringifyQuery(obj) {
     return Object.keys(obj).map(item => encodeURIComponent(item) + '=' + encodeURIComponent(JSON.stringify(obj[item]))).join('&');
   }
-  function compressUrl(url=window.location.href,compress=true) {//compress压缩
+  function compressUrl(url = window.location.href, compress = true) {//compress压缩
     //脱离业务，仅对？后面所有参数进行压缩。
     const newVersion = "01";//压缩版本号
     const code = "l~h";//替符前缀
@@ -478,29 +478,29 @@ c(obj);
     const compressStorage =
     {
       //"01" 2019年8月4日00:37:54
-      "01": ["%0A%0A%0A%0A%0A%0A%0A%0A%0A","%0A%0A%0A%0A%0A%0A%0A%0A","%20%20%20%20%20%20%20%20","\\(%20\\(\\)%20%3D%3E%20%7B","%0A%0A%0A%0A%0A%0A%0A","%20%20%20%20%20%20%20","\\.toLocaleDateString\\(","\\.toLocaleDateString\\(","item%20%3D%3E%20%7B","%0A%0A%0A%0A%0A%0A","%20%20%20%20%20%20","\\.setMilliseconds\\(","\\.getMilliseconds\\(","\\(iten%2C%20index\\)","\\(\\)%20%3D%3E%20%7B","\\.toLocaleString\\(","%20%3D%3D%3D%20","%0A%0A%0A%0A%0A","%20%20%20%20%20","\\(iten%2Cindex\\)","\\.fromCharCode\\(","%7Delse%20if\\(\\)","\\.setFullYear\\(","\\.getFullYear\\(","\\.lastIndexOf\\(","\\.toUpperCase\\(","\\.toLowerCase\\(","item%3D%3E%7B","function%20\\(\\)","\\.setSeconds\\(","\\.setMinutes\\(","\\.getSeconds\\(","\\.getMinutes\\(","\\.charCodeAt\\(","Object\\.keys\\(","%20%3D%3D%20","%20%3D%20%5B","%5B%5D%3B%0A","\\(\\(\\)%3D%3E%7B","%0A%0A%0A%0A","%20%20%20%20","new%20Date\\(","\\.substring\\(","\\(\\)%3D%3E%7B","function%20","%0A%7D%0Ac\\(","\\.setHours\\(","\\.setMonth\\(","\\.getHours\\(","\\.getMonth\\(","Array\\.from","\\.prototype","\\)%20%7B%0A","%7D\\)%3B%0A","function\\(\\)","%27%2C%27","\\.setDate\\(","\\.getTime\\(","\\.getDate\\(","\\.forEach\\(","\\.replace\\(","\\.indexOf\\(","%7D%2C%0A","%7D%2C%20","\\.unshift\\(","\\.reverse\\(","\\.toFixed\\(","typeof%20","%3D%20%7B","undefined","return%20","%0A%0A%0A","%20%20%20","%20%3D%20","%5D%3B%0A","%22%2C%22","\\.getDay\\(","\\.filter\\(","\\.search\\(","\\.substr\\(","\\.charAt\\(","\\.reduce\\(","\\.splice\\(","\\.concat\\(","const%20","\\.shift\\(","\\.slice\\(","\\.match\\(","\\.split\\(","\\)%7B%0A","\\.length","window\\.","\\(event\\)","\\)%3B%0A","\\(item\\)","\\.every","\\.push\\(","\\.sort\\(","\\.join\\(","\\.exec\\(","\\.test\\(","%3D%7B","%3D%5B","%5B%5D","%7D%0A","%7B%0A","%3B%0A","var%20","%3D%3E","%0A%0A","%20%20","let%20"],
+      "01": ["%0A%0A%0A%0A%0A%0A%0A%0A%0A", "%0A%0A%0A%0A%0A%0A%0A%0A", "%20%20%20%20%20%20%20%20", "\\(%20\\(\\)%20%3D%3E%20%7B", "%0A%0A%0A%0A%0A%0A%0A", "%20%20%20%20%20%20%20", "\\.toLocaleDateString\\(", "\\.toLocaleDateString\\(", "item%20%3D%3E%20%7B", "%0A%0A%0A%0A%0A%0A", "%20%20%20%20%20%20", "\\.setMilliseconds\\(", "\\.getMilliseconds\\(", "\\(iten%2C%20index\\)", "\\(\\)%20%3D%3E%20%7B", "\\.toLocaleString\\(", "%20%3D%3D%3D%20", "%0A%0A%0A%0A%0A", "%20%20%20%20%20", "\\(iten%2Cindex\\)", "\\.fromCharCode\\(", "%7Delse%20if\\(\\)", "\\.setFullYear\\(", "\\.getFullYear\\(", "\\.lastIndexOf\\(", "\\.toUpperCase\\(", "\\.toLowerCase\\(", "item%3D%3E%7B", "function%20\\(\\)", "\\.setSeconds\\(", "\\.setMinutes\\(", "\\.getSeconds\\(", "\\.getMinutes\\(", "\\.charCodeAt\\(", "Object\\.keys\\(", "%20%3D%3D%20", "%20%3D%20%5B", "%5B%5D%3B%0A", "\\(\\(\\)%3D%3E%7B", "%0A%0A%0A%0A", "%20%20%20%20", "new%20Date\\(", "\\.substring\\(", "\\(\\)%3D%3E%7B", "function%20", "%0A%7D%0Ac\\(", "\\.setHours\\(", "\\.setMonth\\(", "\\.getHours\\(", "\\.getMonth\\(", "Array\\.from", "\\.prototype", "\\)%20%7B%0A", "%7D\\)%3B%0A", "function\\(\\)", "%27%2C%27", "\\.setDate\\(", "\\.getTime\\(", "\\.getDate\\(", "\\.forEach\\(", "\\.replace\\(", "\\.indexOf\\(", "%7D%2C%0A", "%7D%2C%20", "\\.unshift\\(", "\\.reverse\\(", "\\.toFixed\\(", "typeof%20", "%3D%20%7B", "undefined", "return%20", "%0A%0A%0A", "%20%20%20", "%20%3D%20", "%5D%3B%0A", "%22%2C%22", "\\.getDay\\(", "\\.filter\\(", "\\.search\\(", "\\.substr\\(", "\\.charAt\\(", "\\.reduce\\(", "\\.splice\\(", "\\.concat\\(", "const%20", "\\.shift\\(", "\\.slice\\(", "\\.match\\(", "\\.split\\(", "\\)%7B%0A", "\\.length", "window\\.", "\\(event\\)", "\\)%3B%0A", "\\(item\\)", "\\.every", "\\.push\\(", "\\.sort\\(", "\\.join\\(", "\\.exec\\(", "\\.test\\(", "%3D%7B", "%3D%5B", "%5B%5D", "%7D%0A", "%7B%0A", "%3B%0A", "var%20", "%3D%3E", "%0A%0A", "%20%20", "let%20"],
     }
     //得到参数
-    let {link,queryStr} = parseUrl(url);
-    if(queryStr){
-      if(compress){//压缩
-        compressStorage[newVersion].forEach((item,index)=>{
-          const reg = new RegExp(item,'g');
-          const target = code + index.toString(36).padStart(2,'0');
-          queryStr = queryStr.replace(reg,target);
+    let { link, queryStr } = parseUrl(url);
+    if (queryStr) {
+      if (compress) {//压缩
+        compressStorage[newVersion].forEach((item, index) => {
+          const reg = new RegExp(item, 'g');
+          const target = code + index.toString(36).padStart(2, '0');
+          queryStr = queryStr.replace(reg, target);
         });
         queryStr = 'l~' + newVersion + '~h' + queryStr;
-      }else{//解压缩
+      } else {//解压缩
         const tempMatch = queryStr.match(get_version) || [];
         const version = tempMatch[1] || '';//压缩版本号
-        if(!version){//没有版本的一律不是本方法压缩的，所以url就不做任何改动。
+        if (!version) {//没有版本的一律不是本方法压缩的，所以url就不做任何改动。
           return url;
         }
-        queryStr = queryStr.replace(clear_version,'');
-        compressStorage[version].forEach((item,index)=>{
-          const reg = new RegExp(code_reg + index.toString(36).padStart(2,'0'),'g');
-          const target = item.replace(/\\/g,'');
-          queryStr = queryStr.replace(reg,target);
+        queryStr = queryStr.replace(clear_version, '');
+        compressStorage[version].forEach((item, index) => {
+          const reg = new RegExp(code_reg + index.toString(36).padStart(2, '0'), 'g');
+          const target = item.replace(/\\/g, '');
+          queryStr = queryStr.replace(reg, target);
         });
       }
     }
